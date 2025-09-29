@@ -1,0 +1,1426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Ohio Vehicle Payment Calculator</title>
+    <style>
+        .pc-wrap {
+            max-width: 900px;
+            margin: auto;
+            font: 14px system-ui, 'Segoe UI', Arial;
+            padding: 20px;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            border-radius: 16px;
+        }
+        
+        .pc-header {
+            text-align: center;
+            margin-bottom: 24px;
+            color: #1e293b;
+        }
+        
+        .pc-header h2 {
+            margin: 0 0 8px 0;
+            font-size: 28px;
+            font-weight: 700;
+        }
+        
+        .pc-header p {
+            margin: 0;
+            color: #64748b;
+            font-size: 16px;
+        }
+        
+        .pc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        
+        .pc-colspan {
+            grid-column: 1 / -1;
+        }
+        
+        .pc-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            transition: box-shadow 0.2s ease;
+        }
+        
+        .pc-card:hover {
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .pc-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        
+        .pc-row:last-child {
+            margin-bottom: 0;
+        }
+        
+        .pc-row label {
+            font-weight: 600;
+            color: #374151;
+            flex: 1;
+            min-width: 120px;
+        }
+        
+        .pc-row input,
+        .pc-row select {
+            width: 180px;
+            padding: 10px 12px;
+            border: 2px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .pc-row input:focus,
+        .pc-row select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        .pc-row input.error {
+            border-color: #ef4444;
+        }
+        
+        .pc-h {
+            margin: 0 0 16px 0;
+            font-size: 18px;
+            font-weight: 700;
+            color: #1e293b;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .pc-icon {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+        }
+        
+        .pc-results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        
+        .pc-result-item {
+            text-align: center;
+            padding: 16px;
+            background: #f8fafc;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .pc-result-label {
+            font-size: 12px;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
+        }
+        
+        .pc-result-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1e293b;
+        }
+        
+        .pc-result-value.highlight {
+            font-size: 24px;
+            color: #059669;
+        }
+        
+        .pc-note {
+            background: #fef3c7;
+            border: 1px solid #f59e0b;
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+        
+        .pc-breakdown {
+            background: #f1f5f9;
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 16px;
+        }
+        
+        .pc-breakdown-title {
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #334155;
+        }
+        
+        .pc-breakdown-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 0;
+            border-bottom: 1px dotted #cbd5e1;
+        }
+        
+        .pc-breakdown-item:last-child {
+            border-bottom: none;
+            font-weight: 600;
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid #94a3b8;
+        }
+        
+        .pc-warning {
+            background: #fef2f2;
+            border: 1px solid #fca5a5;
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 12px;
+            color: #991b1b;
+            font-size: 13px;
+        }
+        
+        .pc-reset-btn {
+            background: #6366f1;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.2s ease;
+            margin-top: 16px;
+        }
+        
+        .pc-reset-btn:hover {
+            background: #4f46e5;
+        }
+        
+        .pc-schedule-section {
+            margin-top: 20px;
+        }
+        
+        .pc-schedule-toggle {
+            width: 100%;
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 16px;
+            font-size: 16px;
+            font-weight: 600;
+            color: #374151;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.2s ease;
+        }
+        
+        .pc-schedule-toggle:hover {
+            background: #f1f5f9;
+            border-color: #cbd5e1;
+        }
+        
+        .pc-schedule-toggle.active {
+            background: #dbeafe;
+            border-color: #3b82f6;
+            color: #1e40af;
+        }
+        
+        .pc-toggle-icon {
+            font-size: 14px;
+            transition: transform 0.2s ease;
+        }
+        
+        .pc-schedule-toggle.active .pc-toggle-icon {
+            transform: rotate(90deg);
+        }
+        
+        .pc-schedule-content {
+            margin-top: 16px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 20px;
+        }
+        
+        .pc-schedule-header {
+            margin-bottom: 20px;
+        }
+        
+        .pc-schedule-header h5 {
+            margin: 0 0 12px 0;
+            font-size: 18px;
+            font-weight: 700;
+            color: #1e293b;
+        }
+        
+        .pc-schedule-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            padding: 16px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .pc-schedule-summary-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            background: #f8fafc;
+            border-radius: 6px;
+            font-weight: 600;
+        }
+        
+        .pc-schedule-controls {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .pc-schedule-controls label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 600;
+            color: #374151;
+            cursor: pointer;
+        }
+        
+        .pc-schedule-controls input[type="radio"] {
+            width: auto;
+            margin: 0;
+        }
+        
+        .pc-schedule-table-container {
+            overflow-x: auto;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .pc-schedule-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            font-size: 13px;
+        }
+        
+        .pc-schedule-table th {
+            background: #f1f5f9;
+            padding: 12px 8px;
+            text-align: left;
+            font-weight: 700;
+            color: #374151;
+            border-bottom: 2px solid #e2e8f0;
+            white-space: nowrap;
+        }
+        
+        .pc-schedule-table td {
+            padding: 10px 8px;
+            border-bottom: 1px solid #f1f5f9;
+            text-align: right;
+        }
+        
+        .pc-schedule-table td:first-child {
+            text-align: center;
+            font-weight: 600;
+            color: #374151;
+        }
+        
+        .pc-schedule-table tr:nth-child(even) {
+            background: #f8fafc;
+        }
+        
+        .pc-schedule-table tr:hover {
+            background: #e0f2fe;
+        }
+        
+        .pc-schedule-table .total-row {
+            background: #1e293b !important;
+            color: white;
+            font-weight: 700;
+        }
+        
+        .pc-schedule-table .total-row:hover {
+            background: #334155 !important;
+        }
+        
+        .pc-comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+        
+        .pc-comparison-card {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 20px;
+        }
+        
+        .pc-comparison-card.finance-option {
+            border-color: #3b82f6;
+        }
+        
+        .pc-comparison-card.cash-option {
+            border-color: #10b981;
+        }
+        
+        .pc-comparison-card h6 {
+            margin: 0 0 16px 0;
+            font-size: 16px;
+            font-weight: 700;
+            text-align: center;
+            padding: 8px;
+            border-radius: 6px;
+        }
+        
+        .finance-option h6 {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .cash-option h6 {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .pc-comparison-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px dotted #e2e8f0;
+            font-size: 14px;
+        }
+        
+        .pc-comparison-item:last-child {
+            border-bottom: none;
+        }
+        
+        .pc-comparison-item.highlight {
+            background: #f8fafc;
+            margin: 8px -12px -12px -12px;
+            padding: 12px;
+            border-radius: 0 0 8px 8px;
+            font-weight: 700;
+            font-size: 16px;
+            border-bottom: none;
+        }
+        
+        .pc-recommendation {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border: 2px solid #0ea5e9;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .pc-recommendation.cash-better {
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            border-color: #10b981;
+        }
+        
+        .pc-recommendation.finance-better {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border-color: #f59e0b;
+        }
+        
+        .pc-recommendation-content h6 {
+            margin: 0 0 8px 0;
+            font-size: 18px;
+            font-weight: 700;
+            color: #1e293b;
+        }
+        
+        .pc-recommendation-content p {
+            margin: 0 0 12px 0;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+        
+        .pc-recommendation-details {
+            font-size: 14px;
+            color: #64748b;
+            line-height: 1.4;
+        }
+        
+        .pc-savings-breakdown {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 16px;
+        }
+        
+        .pc-savings-breakdown h6 {
+            margin: 0 0 12px 0;
+            font-size: 14px;
+            font-weight: 700;
+            color: #374151;
+        }
+        
+        .pc-savings-breakdown ul {
+            margin: 0;
+            padding-left: 20px;
+            color: #64748b;
+            font-size: 13px;
+        }
+        
+        .pc-savings-breakdown li {
+            margin-bottom: 4px;
+        }
+        
+        @media (max-width: 768px) {
+            .pc-wrap {
+                padding: 16px;
+            }
+            
+            .pc-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .pc-row input,
+            .pc-row select {
+                width: 100%;
+            }
+            
+            .pc-results-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .pc-schedule-summary {
+                grid-template-columns: 1fr;
+            }
+            
+            .pc-schedule-controls {
+                flex-direction: column;
+                gap: 12px;
+            }
+            
+            .pc-schedule-table {
+                font-size: 12px;
+            }
+            
+            .pc-schedule-table th,
+            .pc-schedule-table td {
+                padding: 8px 4px;
+            }
+            
+            .pc-comparison-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="paycalc" class="pc-wrap">
+        <div class="pc-header">
+            <h2>🚗 Ohio Vehicle Payment Calculator</h2>
+            <p>Calculate accurate payments with Ohio-specific tax rules</p>
+        </div>
+
+        <div class="pc-grid">
+            <!-- Vehicle & Incentives -->
+            <div class="pc-card">
+                <h4 class="pc-h">
+                    <svg class="pc-icon" viewBox="0 0 24 24">
+                        <path d="M12 2L2 7v10c0 5.55 3.84 9.739 9 11 5.16-1.261 9-5.45 9-11V7l-10-5z"/>
+                    </svg>
+                    Vehicle & Incentives
+                </h4>
+                <div class="pc-row">
+                    <label>Vehicle Price ($)</label>
+                    <input id="price" type="number" value="33421" min="0" step="1" placeholder="0">
+                </div>
+                <div class="pc-row">
+                    <label>Rebates / Discounts ($)</label>
+                    <input id="rebate" type="number" value="0" min="0" step="1" placeholder="0">
+                </div>
+                <div class="pc-row">
+                    <label>Vehicle Type</label>
+                    <select id="isNew">
+                        <option value="1" selected>New Vehicle</option>
+                        <option value="0">Used Vehicle</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Trade-In -->
+            <div class="pc-card">
+                <h4 class="pc-h">
+                    <svg class="pc-icon" viewBox="0 0 24 24">
+                        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                    </svg>
+                    Trade-In Information
+                </h4>
+                <div class="pc-row">
+                    <label>Trade-in Value ($)</label>
+                    <input id="trade" type="number" value="0" min="0" step="1" placeholder="0">
+                </div>
+                <div class="pc-row">
+                    <label>Loan Payoff ($)</label>
+                    <input id="payoff" type="number" value="0" min="0" step="1" placeholder="0">
+                </div>
+                <div class="pc-note">
+                    <strong>Ohio Tax Rule:</strong> New vehicles receive trade-in tax credit (reduces taxable amount). Used vehicles do not qualify for trade-in tax credit. Negative equity (payoff > trade value) is added to the taxable base.
+                </div>
+            </div>
+
+            <!-- Taxes & Fees -->
+            <div class="pc-card">
+                <h4 class="pc-h">
+                    <svg class="pc-icon" viewBox="0 0 24 24">
+                        <path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/>
+                    </svg>
+                    Taxes & Fees (Ohio)
+                </h4>
+                <div class="pc-row">
+                    <label class="pc-tooltip">Sales Tax Rate (%)</label>
+                    <input id="taxRate" type="number" value="8.00" step="0.01" min="0" max="15" placeholder="8.00">
+                </div>
+                <div class="pc-row">
+                    <label>Documentation Fee ($)</label>
+                    <input id="docFee" type="number" value="387" min="0" step="1" placeholder="0">
+                </div>
+                <div class="pc-row">
+                    <label>Title Fee ($)</label>
+                    <input id="titleFee" type="number" value="15" min="0" step="1" placeholder="15">
+                </div>
+                <div class="pc-row">
+                    <label>License/Registration ($)</label>
+                    <input id="licenseFee" type="number" value="34.50" min="0" step="0.01" placeholder="34.50">
+                </div>
+                <div class="pc-row">
+                    <label>Other Fees ($)</label>
+                    <input id="otherFees" type="number" value="0" min="0" step="1" placeholder="0">
+                </div>
+                <div class="pc-note">
+                    Ohio sales tax varies by county (typically 7.25%-8.25%). Documentation fees are currently non-taxable in Ohio.
+                </div>
+            </div>
+
+            <!-- Finance Terms -->
+            <div class="pc-card">
+                <h4 class="pc-h">
+                    <svg class="pc-icon" viewBox="0 0 24 24">
+                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                        <path d="M22 6l-10 7L2 6"/>
+                    </svg>
+                    Financing Terms
+                </h4>
+                <div class="pc-row">
+                    <label>Down Payment ($)</label>
+                    <input id="down" type="number" value="2000" min="0" step="1" placeholder="0">
+                </div>
+                <div class="pc-row">
+                    <label>Annual Percentage Rate (%)</label>
+                    <input id="apr" type="number" value="3.9" step="0.01" min="0" max="30" placeholder="3.9">
+                </div>
+                <div class="pc-row">
+                    <label>Loan Term (months)</label>
+                    <select id="term">
+                        <option value="24">24 months</option>
+                        <option value="36">36 months</option>
+                        <option value="48">48 months</option>
+                        <option value="60">60 months</option>
+                        <option value="72" selected>72 months</option>
+                        <option value="84">84 months</option>
+                        <option value="96">96 months</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div class="pc-card pc-colspan">
+            <h4 class="pc-h">
+                <svg class="pc-icon" viewBox="0 0 24 24">
+                    <path d="M9 11H7l3-7 3 7h-2v8H9v-8z"/>
+                    <path d="M13 21h6a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2h6"/>
+                </svg>
+                Payment Calculation Results
+            </h4>
+            
+            <div class="pc-results-grid">
+                <div class="pc-result-item">
+                    <div class="pc-result-label">Taxable Base</div>
+                    <div id="taxBase" class="pc-result-value">$0</div>
+                </div>
+                <div class="pc-result-item">
+                    <div class="pc-result-label">Sales Tax</div>
+                    <div id="taxAmt" class="pc-result-value">$0</div>
+                </div>
+                <div class="pc-result-item">
+                    <div class="pc-result-label">Total Cash Due</div>
+                    <div id="cashDue" class="pc-result-value">$0</div>
+                </div>
+                <div class="pc-result-item">
+                    <div class="pc-result-label">Amount Financed</div>
+                    <div id="amtFin" class="pc-result-value">$0</div>
+                </div>
+                <div class="pc-result-item">
+                    <div class="pc-result-label">Monthly Payment</div>
+                    <div id="pmt" class="pc-result-value highlight">$0</div>
+                </div>
+                <div class="pc-result-item">
+                    <div class="pc-result-label">Total Interest</div>
+                    <div id="totalInt" class="pc-result-value">$0</div>
+                </div>
+            </div>
+
+            <div class="pc-breakdown">
+                <div class="pc-breakdown-title">Cost Breakdown</div>
+                <div class="pc-breakdown-item">
+                    <span>Vehicle Price:</span>
+                    <span id="bd-price">$0</span>
+                </div>
+                <div class="pc-breakdown-item">
+                    <span>Less: Rebates/Discounts:</span>
+                    <span id="bd-rebate">-$0</span>
+                </div>
+                <div class="pc-breakdown-item">
+                    <span>Less: Trade-in Value:</span>
+                    <span id="bd-trade">-$0</span>
+                </div>
+                <div class="pc-breakdown-item">
+                    <span>Plus: Loan Payoff:</span>
+                    <span id="bd-payoff">$0</span>
+                </div>
+                <div class="pc-breakdown-item">
+                    <span>Plus: Sales Tax:</span>
+                    <span id="bd-tax">$0</span>
+                </div>
+                <div class="pc-breakdown-item">
+                    <span>Plus: Fees:</span>
+                    <span id="bd-fees">$0</span>
+                </div>
+                <div class="pc-breakdown-item">
+                    <span>Total Cost:</span>
+                    <span id="bd-total">$0</span>
+                </div>
+            </div>
+
+            <div id="warnings"></div>
+            
+            <!-- Payment Schedule Section -->
+            <div class="pc-schedule-section">
+                <button class="pc-schedule-toggle" onclick="toggleSchedule()">
+                    <span class="pc-toggle-icon">▶</span>
+                    <span>View Payment Schedule</span>
+                </button>
+                
+                <div id="payment-schedule" class="pc-schedule-content" style="display: none;">
+                    <div class="pc-schedule-header">
+                        <h5>Amortization Schedule</h5>
+                        <div class="pc-schedule-summary">
+                            <div class="pc-schedule-summary-item">
+                                <span>Total Payments:</span>
+                                <span id="total-payments">$0</span>
+                            </div>
+                            <div class="pc-schedule-summary-item">
+                                <span>Total Interest:</span>
+                                <span id="total-interest-schedule">$0</span>
+                            </div>
+                            <div class="pc-schedule-summary-item">
+                                <span>Interest as % of Principal:</span>
+                                <span id="interest-percentage">0%</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="pc-schedule-controls">
+                        <label>
+                            <input type="radio" name="schedule-view" value="yearly" checked> Yearly Summary
+                        </label>
+                        <label>
+                            <input type="radio" name="schedule-view" value="monthly"> Monthly Detail
+                        </label>
+                    </div>
+                    
+                    <div class="pc-schedule-table-container">
+                        <table class="pc-schedule-table" id="schedule-table">
+                            <thead>
+                                <tr id="schedule-headers">
+                                    <th>Year</th>
+                                    <th>Principal</th>
+                                    <th>Interest</th>
+                                    <th>Total Paid</th>
+                                    <th>Balance</th>
+                                </tr>
+                            </thead>
+                            <tbody id="schedule-body">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Finance vs Cash Analysis -->
+            <div class="pc-schedule-section">
+                <button class="pc-schedule-toggle" onclick="toggleSavingsAnalysis()">
+                    <span class="pc-toggle-icon">▶</span>
+                    <span>Finance vs. Cash Analysis</span>
+                </button>
+                
+                <div id="savings-analysis" class="pc-schedule-content" style="display: none;">
+                    <div class="pc-schedule-header">
+                        <h5>Should You Finance or Pay Cash?</h5>
+                        <div class="pc-row" style="margin-bottom: 20px; justify-content: flex-start; gap: 20px;">
+                            <label>High-Yield Savings Rate (%):</label>
+                            <input id="savingsRate" type="number" value="3.5" step="0.01" min="0" max="10" style="width: 100px;">
+                        </div>
+                    </div>
+                    
+                    <div class="pc-comparison-grid">
+                        <div class="pc-comparison-card finance-option">
+                            <h6>💳 Finance Option</h6>
+                            <div class="pc-comparison-item">
+                                <span>Cash Needed Today:</span>
+                                <span id="finance-cash-today">$0</span>
+                            </div>
+                            <div class="pc-comparison-item">
+                                <span>Monthly Payment:</span>
+                                <span id="finance-monthly">$0</span>
+                            </div>
+                            <div class="pc-comparison-item">
+                                <span>Total Interest Paid:</span>
+                                <span id="finance-interest-paid">$0</span>
+                            </div>
+                            <div class="pc-comparison-item">
+                                <span>Cash Invested:</span>
+                                <span id="finance-cash-invested">$0</span>
+                            </div>
+                            <div class="pc-comparison-item">
+                                <span>Investment Growth:</span>
+                                <span id="finance-investment-growth">$0</span>
+                            </div>
+                            <div class="pc-comparison-item highlight">
+                                <span>Net Position After Loan:</span>
+                                <span id="finance-net-position">$0</span>
+                            </div>
+                        </div>
+                        
+                        <div class="pc-comparison-card cash-option">
+                            <h6>💰 Pay Cash Option</h6>
+                            <div class="pc-comparison-item">
+                                <span>Cash Needed Today:</span>
+                                <span id="cash-needed-today">$0</span>
+                            </div>
+                            <div class="pc-comparison-item">
+                                <span>Monthly Payment:</span>
+                                <span>$0</span>
+                            </div>
+                            <div class="pc-comparison-item">
+                                <span>Interest Saved:</span>
+                                <span id="cash-interest-saved">$0</span>
+                            </div>
+                            <div class="pc-comparison-item">
+                                <span>Monthly Savings to Invest:</span>
+                                <span id="cash-monthly-savings">$0</span>
+                            </div>
+                            <div class="pc-comparison-item">
+                                <span>Investment Growth:</span>
+                                <span id="cash-investment-growth">$0</span>
+                            </div>
+                            <div class="pc-comparison-item highlight">
+                                <span>Net Position After Term:</span>
+                                <span id="cash-net-position">$0</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="pc-recommendation" id="recommendation">
+                        <div class="pc-recommendation-content">
+                            <h6 id="recommendation-title">💡 Recommendation</h6>
+                            <p id="recommendation-text">Enter loan details to see analysis.</p>
+                            <div class="pc-recommendation-details" id="recommendation-details"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="pc-savings-breakdown">
+                        <h6>Key Assumptions</h6>
+                        <ul>
+                            <li>High-yield savings account compounds monthly</li>
+                            <li>Investment returns are consistent over the loan term</li>
+                            <li>Tax implications are not considered</li>
+                            <li>Analysis compares net worth at end of loan term</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <button class="pc-reset-btn" onclick="resetCalculator()">Reset Calculator</button>
+        </div>
+    </div>
+
+    <script>
+        (function(){
+            const $ = id => document.getElementById(id);
+            const fmt = n => new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(n);
+            const fmtDecimal = n => new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD'
+            }).format(n);
+
+            const inputs = [
+                "price", "rebate", "isNew", "trade", "payoff", 
+                "taxRate", "docFee", "titleFee", "licenseFee", "otherFees", 
+                "down", "apr", "term", "savingsRate"
+            ];
+            
+            let currentSchedule = [];
+            let calculationData = {};
+
+            // Add event listeners with debouncing
+            inputs.forEach(id => {
+                const element = $(id);
+                if (element) {
+                    let timeout;
+                    element.addEventListener("input", () => {
+                        clearTimeout(timeout);
+                        timeout = setTimeout(calc, 150);
+                    });
+                }
+            });
+
+            // Add specific listener for savings rate changes
+            const savingsRateInput = $("savingsRate");
+            if (savingsRateInput) {
+                let timeout;
+                savingsRateInput.addEventListener("input", () => {
+                    clearTimeout(timeout);
+                    timeout = setTimeout(() => {
+                        if ($("savings-analysis").style.display !== 'none') {
+                            updateSavingsAnalysis();
+                        }
+                    }, 150);
+                });
+            }
+
+            function validateInputs() {
+                let hasErrors = false;
+                const warnings = [];
+                
+                // Clear previous error states
+                inputs.forEach(id => {
+                    const element = $(id);
+                    if (element && element.type === 'number') {
+                        element.classList.remove('error');
+                    }
+                });
+
+                const price = +$("price").value || 0;
+                const down = +$("down").value || 0;
+                const trade = +$("trade").value || 0;
+                const payoff = +$("payoff").value || 0;
+                const apr = +$("apr").value || 0;
+
+                if (price <= 0) {
+                    $("price").classList.add('error');
+                    hasErrors = true;
+                }
+
+                if (down > price) {
+                    warnings.push("Down payment exceeds vehicle price.");
+                }
+
+                if (payoff > 0 && trade === 0) {
+                    warnings.push("You have a loan payoff but no trade-in value entered.");
+                }
+
+                if (apr > 15) {
+                    warnings.push("Interest rate seems unusually high. Please verify.");
+                }
+
+                // Display warnings
+                const warningsDiv = $("warnings");
+                if (warnings.length > 0) {
+                    warningsDiv.innerHTML = '<div class="pc-warning"><strong>Warnings:</strong><br>' + 
+                        warnings.map(w => '• ' + w).join('<br>') + '</div>';
+                } else {
+                    warningsDiv.innerHTML = '';
+                }
+
+                return !hasErrors;
+            }
+
+            function calc() {
+                if (!validateInputs()) return;
+
+                const price = +$("price").value || 0;
+                const rebate = +$("rebate").value || 0;
+                const isNew = $("isNew").value === "1";
+                const trade = +$("trade").value || 0;
+                const payoff = +$("payoff").value || 0;
+                const taxRate = (+$("taxRate").value || 0) / 100;
+                const docFee = +$("docFee").value || 0;
+                const titleFee = +$("titleFee").value || 0;
+                const licenseFee = +$("licenseFee").value || 0;
+                const otherFees = +$("otherFees").value || 0;
+                const down = +$("down").value || 0;
+                const apr = (+$("apr").value || 0) / 100;
+                const term = +$("term").value || 0;
+
+                // Calculate negative equity
+                const negativeEquity = Math.max(payoff - trade, 0);
+                
+                // Ohio-specific tax calculation
+                const tradeCreditForTax = isNew ? trade : 0;
+                const taxableBase = Math.max(price - rebate + negativeEquity - tradeCreditForTax, 0);
+                const salesTax = taxableBase * taxRate;
+                
+                // Total fees (non-taxable in Ohio)
+                const totalFees = docFee + titleFee + licenseFee + otherFees;
+                
+                // Calculate financing
+                const capitalizedCost = price - rebate - trade + negativeEquity;
+                const totalCost = capitalizedCost + salesTax + totalFees;
+                const amountFinanced = Math.max(totalCost - down, 0);
+                
+                // Monthly payment calculation
+                const monthlyRate = apr / 12;
+                let monthlyPayment = 0;
+                let totalInterest = 0;
+                
+                if (amountFinanced > 0 && term > 0) {
+                    if (monthlyRate === 0) {
+                        monthlyPayment = amountFinanced / term;
+                    } else {
+                        monthlyPayment = (amountFinanced * monthlyRate) / 
+                            (1 - Math.pow(1 + monthlyRate, -term));
+                    }
+                    totalInterest = (monthlyPayment * term) - amountFinanced;
+                    
+                    // Generate payment schedule
+                    currentSchedule = generatePaymentSchedule(amountFinanced, monthlyRate, term, monthlyPayment);
+                }
+
+                // Store calculation data for savings analysis
+                calculationData = {
+                    amountFinanced,
+                    monthlyPayment,
+                    totalCost,
+                    totalInterest,
+                    down,
+                    term,
+                    apr,
+                    monthlyRate
+                };
+
+                // Update results
+                $("taxBase").textContent = fmt(taxableBase);
+                $("taxAmt").textContent = fmt(salesTax);
+                $("cashDue").textContent = fmt(down);
+                $("amtFin").textContent = fmt(amountFinanced);
+                $("pmt").textContent = fmtDecimal(monthlyPayment);
+                $("totalInt").textContent = fmt(totalInterest);
+
+                // Update breakdown
+                $("bd-price").textContent = fmt(price);
+                $("bd-rebate").textContent = rebate > 0 ? `-${fmt(rebate)}` : '$0';
+                $("bd-trade").textContent = trade > 0 ? `-${fmt(trade)}` : '$0';
+                $("bd-payoff").textContent = payoff > 0 ? `+${fmt(payoff)}` : '$0';
+                $("bd-tax").textContent = `+${fmt(salesTax)}`;
+                $("bd-fees").textContent = `+${fmt(totalFees)}`;
+                $("bd-total").textContent = fmt(totalCost);
+                
+                // Update schedule if visible
+                if ($("payment-schedule").style.display !== 'none') {
+                    updateScheduleDisplay();
+                }
+                
+                // Always update savings analysis if visible (not just when data changes)
+                if ($("savings-analysis").style.display !== 'none') {
+                    updateSavingsAnalysis();
+                }
+            }
+
+            function generatePaymentSchedule(principal, monthlyRate, termMonths, payment) {
+                const schedule = [];
+                let balance = principal;
+                
+                for (let month = 1; month <= termMonths; month++) {
+                    const interestPayment = balance * monthlyRate;
+                    const principalPayment = payment - interestPayment;
+                    balance -= principalPayment;
+                    
+                    // Adjust final payment for rounding
+                    if (month === termMonths && Math.abs(balance) < 1) {
+                        const finalPrincipalPayment = principalPayment + balance;
+                        balance = 0;
+                        schedule.push({
+                            month,
+                            payment: finalPrincipalPayment + interestPayment,
+                            principal: finalPrincipalPayment,
+                            interest: interestPayment,
+                            balance: 0
+                        });
+                    } else {
+                        schedule.push({
+                            month,
+                            payment: payment,
+                            principal: principalPayment,
+                            interest: interestPayment,
+                            balance: Math.max(0, balance)
+                        });
+                    }
+                }
+                
+                return schedule;
+            }
+
+            function updateScheduleDisplay() {
+                if (currentSchedule.length === 0) return;
+                
+                const isYearly = document.querySelector('input[name="schedule-view"]:checked').value === 'yearly';
+                const tableHeaders = $("schedule-headers");
+                const tableBody = $("schedule-body");
+                
+                // Update headers
+                if (isYearly) {
+                    tableHeaders.innerHTML = `
+                        <th>Year</th>
+                        <th>Principal Paid</th>
+                        <th>Interest Paid</th>
+                        <th>Total Paid</th>
+                        <th>Ending Balance</th>
+                    `;
+                } else {
+                    tableHeaders.innerHTML = `
+                        <th>Payment #</th>
+                        <th>Principal</th>
+                        <th>Interest</th>
+                        <th>Total Payment</th>
+                        <th>Balance</th>
+                    `;
+                }
+                
+                // Clear existing rows
+                tableBody.innerHTML = '';
+                
+                if (isYearly) {
+                    displayYearlySchedule(tableBody);
+                } else {
+                    displayMonthlySchedule(tableBody);
+                }
+                
+                // Update summary
+                const totalPaid = currentSchedule.reduce((sum, payment) => sum + payment.payment, 0);
+                const totalInterestPaid = currentSchedule.reduce((sum, payment) => sum + payment.interest, 0);
+                const principal = currentSchedule.length > 0 ? calculationData.amountFinanced : 0;
+                const interestPercentage = principal > 0 ? (totalInterestPaid / principal * 100) : 0;
+                
+                $("total-payments").textContent = fmt(totalPaid);
+                $("total-interest-schedule").textContent = fmt(totalInterestPaid);
+                $("interest-percentage").textContent = interestPercentage.toFixed(1) + '%';
+            }
+
+            function displayYearlySchedule(tableBody) {
+                const yearlyData = {};
+                
+                // Group payments by year
+                currentSchedule.forEach(payment => {
+                    const year = Math.ceil(payment.month / 12);
+                    if (!yearlyData[year]) {
+                        yearlyData[year] = {
+                            principal: 0,
+                            interest: 0,
+                            payment: 0,
+                            endingBalance: 0
+                        };
+                    }
+                    yearlyData[year].principal += payment.principal;
+                    yearlyData[year].interest += payment.interest;
+                    yearlyData[year].payment += payment.payment;
+                    yearlyData[year].endingBalance = payment.balance;
+                });
+                
+                // Create table rows
+                let totalPrincipal = 0, totalInterest = 0, totalPayments = 0;
+                
+                Object.keys(yearlyData).forEach(year => {
+                    const data = yearlyData[year];
+                    totalPrincipal += data.principal;
+                    totalInterest += data.interest;
+                    totalPayments += data.payment;
+                    
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${year}</td>
+                        <td>${fmt(data.principal)}</td>
+                        <td>${fmt(data.interest)}</td>
+                        <td>${fmt(data.payment)}</td>
+                        <td>${fmt(data.endingBalance)}</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+                
+                // Add totals row
+                const totalRow = document.createElement('tr');
+                totalRow.className = 'total-row';
+                totalRow.innerHTML = `
+                    <td>Total</td>
+                    <td>${fmt(totalPrincipal)}</td>
+                    <td>${fmt(totalInterest)}</td>
+                    <td>${fmt(totalPayments)}</td>
+                    <td>$0</td>
+                `;
+                tableBody.appendChild(totalRow);
+            }
+
+            function displayMonthlySchedule(tableBody) {
+                // Limit to first 60 payments for performance
+                const paymentsToShow = Math.min(currentSchedule.length, 60);
+                let totalPrincipal = 0, totalInterest = 0, totalPayments = 0;
+                
+                for (let i = 0; i < paymentsToShow; i++) {
+                    const payment = currentSchedule[i];
+                    totalPrincipal += payment.principal;
+                    totalInterest += payment.interest;
+                    totalPayments += payment.payment;
+                    
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${payment.month}</td>
+                        <td>${fmt(payment.principal)}</td>
+                        <td>${fmt(payment.interest)}</td>
+                        <td>${fmt(payment.payment)}</td>
+                        <td>${fmt(payment.balance)}</td>
+                    `;
+                    tableBody.appendChild(row);
+                }
+                
+                // Show message if there are more payments
+                if (currentSchedule.length > 60) {
+                    const moreRow = document.createElement('tr');
+                    moreRow.innerHTML = `
+                        <td colspan="5" style="text-align: center; padding: 16px; font-style: italic; color: #64748b;">
+                            Showing first 60 payments. Switch to yearly view to see complete summary.
+                        </td>
+                    `;
+                    tableBody.appendChild(moreRow);
+                    
+                    // Calculate remaining totals
+                    for (let i = 60; i < currentSchedule.length; i++) {
+                        const payment = currentSchedule[i];
+                        totalPrincipal += payment.principal;
+                        totalInterest += payment.interest;
+                        totalPayments += payment.payment;
+                    }
+                }
+                
+                // Add totals row
+                const totalRow = document.createElement('tr');
+                totalRow.className = 'total-row';
+                totalRow.innerHTML = `
+                    <td>Total</td>
+                    <td>${fmt(totalPrincipal)}</td>
+                    <td>${fmt(totalInterest)}</td>
+                    <td>${fmt(totalPayments)}</td>
+                    <td>$0</td>
+                `;
+                tableBody.appendChild(totalRow);
+            }
+
+            function updateSavingsAnalysis() {
+                const { amountFinanced, monthlyPayment, totalCost, totalInterest, down, term } = calculationData;
+                const savingsRate = (+$("savingsRate").value || 0) / 100;
+                const loanRate = (+$("apr").value || 0) / 100;
+                
+                if (!amountFinanced || !term) {
+                    // Clear all fields if no loan data
+                    const fields = [
+                        'finance-cash-today', 'finance-monthly', 'finance-interest-paid',
+                        'finance-cash-invested', 'finance-investment-growth', 'finance-net-position',
+                        'cash-needed-today', 'cash-interest-saved', 'cash-monthly-savings',
+                        'cash-investment-growth', 'cash-net-position'
+                    ];
+                    fields.forEach(field => {
+                        const element = $(field);
+                        if (element) element.textContent = '$0';
+                    });
+                    return;
+                }
+                
+                const monthlySavingsRate = savingsRate / 12;
+                
+                // Finance Option: Invest the total cost amount (what you would have paid in cash)
+                const cashAvailableToInvest = totalCost - down;
+                const financeInvestmentGrowth = cashAvailableToInvest * Math.pow(1 + monthlySavingsRate, term);
+                const financeNetPosition = financeInvestmentGrowth - totalInterest;
+                
+                // Cash Option: Pay cash upfront, then invest the monthly payment amount
+                const cashNeeded = totalCost;
+                const monthlyInvestment = monthlyPayment;
+                
+                // Calculate future value of monthly investments (annuity)
+                let cashInvestmentGrowth = 0;
+                if (monthlySavingsRate > 0) {
+                    cashInvestmentGrowth = monthlyInvestment * 
+                        ((Math.pow(1 + monthlySavingsRate, term) - 1) / monthlySavingsRate);
+                } else {
+                    cashInvestmentGrowth = monthlyInvestment * term;
+                }
+                
+                // Update Finance Option
+                $("finance-cash-today").textContent = fmt(down);
+                $("finance-monthly").textContent = fmtDecimal(monthlyPayment);
+                $("finance-interest-paid").textContent = fmt(totalInterest);
+                $("finance-cash-invested").textContent = fmt(cashAvailableToInvest);
+                $("finance-investment-growth").textContent = fmt(financeInvestmentGrowth);
+                $("finance-net-position").textContent = fmt(financeNetPosition);
+                
+                // Update Cash Option
+                $("cash-needed-today").textContent = fmt(cashNeeded);
+                $("cash-interest-saved").textContent = fmt(totalInterest);
+                $("cash-monthly-savings").textContent = fmtDecimal(monthlyPayment);
+                $("cash-investment-growth").textContent = fmt(cashInvestmentGrowth);
+                $("cash-net-position").textContent = fmt(cashInvestmentGrowth);
+                
+                // Generate recommendation
+                const difference = cashInvestmentGrowth - financeNetPosition;
+                const recommendation = $("recommendation");
+                const title = $("recommendation-title");
+                const text = $("recommendation-text");
+                const details = $("recommendation-details");
+                
+                // Remove existing classes
+                recommendation.classList.remove('cash-better', 'finance-better');
+                
+                if (Math.abs(difference) < 500) {
+                    title.textContent = "🤝 Either Option Works";
+                    text.textContent = "The financial difference is minimal (less than $500). Choose based on your personal preference for cash flow and risk tolerance.";
+                    details.innerHTML = `
+                        <strong>Difference:</strong> ${fmt(Math.abs(difference))} advantage to ${difference > 0 ? 'paying cash' : 'financing'}<br>
+                        <strong>Your loan rate:</strong> ${(loanRate * 100).toFixed(2)}% vs <strong>Savings rate:</strong> ${(savingsRate * 100).toFixed(2)}%
+                    `;
+                } else if (difference > 0) {
+                    recommendation.classList.add('cash-better');
+                    title.textContent = "💰 Pay Cash - Better Choice";
+                    text.textContent = "Paying cash and investing the monthly payment amount comes out ahead financially.";
+                    details.innerHTML = `
+                        <strong>Advantage:</strong> ${fmt(difference)} better net position<br>
+                        <strong>Why:</strong> Avoiding ${fmt(totalInterest)} in interest payments and investing ${fmtDecimal(monthlyPayment)} monthly grows to ${fmt(cashInvestmentGrowth)}.
+                    `;
+                } else {
+                    recommendation.classList.add('finance-better');
+                    title.textContent = "💳 Finance - Better Choice";
+                    text.textContent = "Financing and investing the full amount upfront comes out ahead financially.";
+                    details.innerHTML = `
+                        <strong>Advantage:</strong> ${fmt(Math.abs(difference))} better net position<br>
+                        <strong>Why:</strong> Investing ${fmt(cashAvailableToInvest)} upfront at ${(savingsRate * 100).toFixed(2)}% grows to ${fmt(financeInvestmentGrowth)}, which beats paying cash even after ${fmt(totalInterest)} in interest.
+                    `;
+                }
+            }
+
+            // Add event listeners for schedule view toggles
+            document.querySelectorAll('input[name="schedule-view"]').forEach(radio => {
+                radio.addEventListener('change', updateScheduleDisplay);
+            });
+
+            // Toggle functions
+            window.toggleSchedule = function() {
+                const scheduleContent = $("payment-schedule");
+                const toggleButtons = document.querySelectorAll(".pc-schedule-toggle");
+                const toggleButton = toggleButtons[0];
+                const icon = toggleButton.querySelector('.pc-toggle-icon');
+                
+                if (scheduleContent.style.display === 'none') {
+                    scheduleContent.style.display = 'block';
+                    toggleButton.classList.add('active');
+                    icon.textContent = '▼';
+                    updateScheduleDisplay();
+                } else {
+                    scheduleContent.style.display = 'none';
+                    toggleButton.classList.remove('active');
+                    icon.textContent = '▶';
+                }
+            };
+
+            window.toggleSavingsAnalysis = function() {
+                const savingsContent = $("savings-analysis");
+                const toggleButtons = document.querySelectorAll(".pc-schedule-toggle");
+                const toggleButton = toggleButtons[1];
+                const icon = toggleButton.querySelector('.pc-toggle-icon');
+                
+                if (savingsContent.style.display === 'none') {
+                    savingsContent.style.display = 'block';
+                    toggleButton.classList.add('active');
+                    icon.textContent = '▼';
+                    // Force immediate update when opening
+                    setTimeout(updateSavingsAnalysis, 50);
+                } else {
+                    savingsContent.style.display = 'none';
+                    toggleButton.classList.remove('active');
+                    icon.textContent = '▶';
+                }
+            };
+
+            // Reset function
+            window.resetCalculator = function() {
+                $("price").value = "33421";
+                $("rebate").value = "0";
+                $("isNew").value = "1";
+                $("trade").value = "0";
+                $("payoff").value = "0";
+                $("taxRate").value = "8.00";
+                $("docFee").value = "387";
+                $("titleFee").value = "15";
+                $("licenseFee").value = "34.50";
+                $("otherFees").value = "0";
+                $("down").value = "2000";
+                $("apr").value = "3.9";
+                $("term").value = "72";
+                $("savingsRate").value = "3.5";
+                
+                // Reset all sections
+                const scheduleContent = $("payment-schedule");
+                const savingsContent = $("savings-analysis");
+                const toggleButtons = document.querySelectorAll(".pc-schedule-toggle");
+                
+                scheduleContent.style.display = 'none';
+                savingsContent.style.display = 'none';
+                toggleButtons.forEach(btn => {
+                    btn.classList.remove('active');
+                    const icon = btn.querySelector('.pc-toggle-icon');
+                    if (icon) icon.textContent = '▶';
+                });
+                
+                // Reset radio button
+                const yearlyRadio = document.querySelector('input[name="schedule-view"][value="yearly"]');
+                if (yearlyRadio) yearlyRadio.checked = true;
+                
+                calc();
+            };
+
+            // Initial calculation
+            calc();
+        })();
+    </script>
+</body>
+</html>
